@@ -4,6 +4,7 @@ use warnings;
 use AnyEvent;
 use AnyEvent::Handle::UDP;
 use AnyEvent::HTTP;
+use Net::DNS::Packet;
 
 my $uri = 'https://1.1.1.1/dns-query';
 my $proxy = 'http://127.0.0.1:8118';
@@ -16,12 +17,13 @@ my $named = AnyEvent::Handle::UDP->new(
 		# Called when a new UDP packet has been received, forward
 		# dns query to the configured HTTP endpoint, $uri.
 		my ($data, $ae, $client) = @_;
-		http_post $uri, $data,
+		my ($pkt, $qlen) = Net::DNS::Packet->new(\$data);
+		http_post $uri, $pkt->data,
 			headers => {
 				Accept => 'application/dns-message',
 				'User-Agent' => '',
 				'Content-Type' => 'application/dns-message',
-				'Content-Length' => length($data),
+				'Content-Length' => $qlen,
 			},
 			tls_ctx => 'high',
 			persistent => 1,
@@ -29,7 +31,8 @@ my $named = AnyEvent::Handle::UDP->new(
 				# Called when HTTP query completes, send
 				# back response payload to our client
 				my ($data, $headers) = @_;
-				$ae->push_send(shift, $client)
+				my $pkt = Net::DNS::Packet->new(\$data);
+				$ae->push_send($pkt->data, $client)
 			};
 	},
 );
