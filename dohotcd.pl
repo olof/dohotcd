@@ -18,7 +18,10 @@ sub required_setting {
 required_setting($config, $_) for qw(uri proxy port address);
 
 AnyEvent::HTTP::set_proxy($config->{proxy});
-$AnyEvent::HTTP::USERAGENT = '';
+$AnyEvent::HTTP::USERAGENT = $config->{http_user_agent} // '';
+$AnyEvent::HTTP::TIMEOUT = $config->{http_timeout} // 5;
+$AnyEvent::HTTP::MAX_PER_HOST = $config->{http_concurrent} // 5;
+$AnyEvent::HTTP::PERSISTENT_TIMEOUT = $config->{http_keep_alive_timeout} // 30;
 
 my $named = AnyEvent::Handle::UDP->new(
 	bind => [$config->{address}, $config->{port}],
