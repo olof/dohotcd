@@ -18,6 +18,7 @@ sub required_setting {
 required_setting($config, $_) for qw(uri proxy port address);
 
 AnyEvent::HTTP::set_proxy($config->{proxy});
+$AnyEvent::HTTP::USERAGENT = '';
 
 my $named = AnyEvent::Handle::UDP->new(
 	bind => [$config->{address}, $config->{port}],
@@ -29,7 +30,6 @@ my $named = AnyEvent::Handle::UDP->new(
 		http_post $config->{uri}, $pkt->data,
 			headers => {
 				Accept => 'application/dns-message',
-				'User-Agent' => '',
 				'Content-Type' => 'application/dns-message',
 				'Content-Length' => $qlen,
 			},
