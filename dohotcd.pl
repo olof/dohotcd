@@ -5,20 +5,28 @@ use AnyEvent;
 use AnyEvent::Handle::UDP;
 use AnyEvent::HTTP;
 use Net::DNS::Packet;
+use YAML;
 
-my $uri = 'https://1.1.1.1/dns-query';
-my $proxy = 'http://127.0.0.1:8118';
+my $config_file = $ENV{DOHOTCD_CONFIG} // '/etc/dohotcd/config.yml';
+my $config = Load($config_file);
 
-AnyEvent::HTTP::set_proxy($proxy);
+sub required_setting {
+	my ($cfg, $name) = @_;
+	return if defined $cfg->{$name};
+	die("ERROR! dohotcd: Missing setting in $config_file: $name!\n");
+}
+required_setting($config, $_) for qw(uri proxy port address);
+
+AnyEvent::HTTP::set_proxy($config->{proxy});
 
 my $named = AnyEvent::Handle::UDP->new(
-	bind => ['::1', 5354],
+	bind => [$config->{address}, $config->{port}],
 	on_recv => sub {
 		# Called when a new UDP packet has been received, forward
 		# dns query to the configured HTTP endpoint, $uri.
 		my ($data, $ae, $client) = @_;
 		my ($pkt, $qlen) = Net::DNS::Packet->new(\$data);
-		http_post $uri, $pkt->data,
+		http_post $config->{uri}, $pkt->data,
 			headers => {
 				Accept => 'application/dns-message',
 				'User-Agent' => '',
