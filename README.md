@@ -9,7 +9,8 @@ First time installation, preparations; run the following as root:
 apt-get install libanyevent-perl \
                 libanyevent-handle-udp-perl \
                 libanyevent-http-perl \
-                libnet-dns-perl
+                libnet-dns-perl \
+                libyaml-perl
 adduser --system --home /var/lib/dohotcd dohotcd
 ```
 
