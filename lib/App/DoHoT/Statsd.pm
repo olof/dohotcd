@@ -65,8 +65,6 @@ sub report_question {
 	incr("$prefix.class." . $q->qclass);
 	incr("$prefix.type." . $q->qtype);
 	report_name($prefix, $q->qname);
-	printf STDERR "DEBUG: [%d] query for %s (%s)\n",
-		$pkt->header->id, $q->qname, $q->qtype;
 }
 
 sub report_answer {
@@ -81,27 +79,22 @@ sub report {
 	report_header($prefix, $pkt->header);
 	timing("$prefix.ancount", $pkt->header->ancount);
 	timing("$prefix.qdcount", $pkt->header->qdcount);
-
-	for ($pkt->answer) {
-		report_answer($prefix, $pkt, $_);
-	}
-
-	for ($pkt->question) {
-		report_question($prefix, $pkt, $_);
-	}
 }
 
 sub report_query {
 	my $pkt = shift;
 	return unless defined $Net::Statsd::HOST;
 	report('query', $pkt);
+	report_question('query', $pkt, $_) for $pkt->question;
+	printf STDERR "DEBUG: [%d] query for %s (%s)\n",
+		$pkt->header->id, $_->qname, $_->qtype for $pkt->question;
 }
 
 sub report_reply {
 	my ($pkt, $time) = @_;
 	return unless defined $Net::Statsd::HOST;
 	report('answer', $pkt);
-
+	report_answer('answer', $pkt, $_) for $pkt->answer;
 	printf STDERR "DEBUG: [%d] got %d answer(s): %s\n",
 		$pkt->header->id,
 		$pkt->header->ancount,
