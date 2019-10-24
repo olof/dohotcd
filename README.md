@@ -14,14 +14,17 @@ apt-get install libanyevent-perl \
 adduser --system --home /var/lib/dohotcd dohotcd
 ```
 
-When updating, run the following as root; assuming systemd is
-used as init manager:
+To install the software, run the following (it assumes the use of
+systemd as init manager):
 
 ```
 perl Makefile.PL
-sudo make install
+```
 
-sudo adduser --system --home /var/lib/dohotcd
+and, then as root:
+
+```
+make install
 cp config.yml /etc/dohotcd/config.yml
 cp dohotcd.service /etc/systemd/system
 systemctl enable dohotcd.service
@@ -29,5 +32,11 @@ systemctl start dohotcd.service
 ```
 
 The dohotcd user is referenced from the systemd service file.
+
+## TODO
+
+* Try to make use of http/2
+* Add tests
+* Add support for sysvinit
 
 [blog]: https://blog.3.14159.se/posts/2019/10/22/dns-over-https-over-tor
