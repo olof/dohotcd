@@ -1,0 +1,12 @@
+[Unit]
+Description=dohotcd stub proxy DoH resolver daemon
+After=network.target privoxy.service tor.service
+
+[Service]
+User=dohotcd
+ExecStart=/usr/sbin/dohotcd
+StandardError=syslog
+SyslogIdentifier=dohotcd
+
+[Install]
+WantedBy=multi-user.target

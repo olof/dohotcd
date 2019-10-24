@@ -1,0 +1,2 @@
+#!/bin/sh
+perl -MApp::DoHoT=main -E 'main()'

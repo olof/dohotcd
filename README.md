@@ -18,7 +18,11 @@ When updating, run the following as root; assuming systemd is
 used as init manager:
 
 ```
-make install
+perl Makefile.PL
+sudo make install
+
+sudo adduser --system --home /var/lib/dohotcd
+cp config.yml /etc/dohotcd/config.yml
 cp dohotcd.service /etc/systemd/system
 systemctl enable dohotcd.service
 systemctl start dohotcd.service
