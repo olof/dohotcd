@@ -71,11 +71,12 @@ forward-zone:
 ```
 
 serve-expired is kind of nice, because of the increased query
-times, we can speed up our name resolution a bit by cheating
-through serving cached item even after they have expired. The
-expired item is served to the client immediately but is queried
-asynchronously and the cache will be updated as the recursive
-response arrives.
+times we see by tunneling over Tor, we can speed up our name
+resolution (from the perspective of the querying application) a
+bit by cheating through serving cached item even after they have
+expired. The expired item is served to the client immediately but
+is also queried asynchronously and the cache will be updated as
+the recursive response arrives.
 
 ## TODO
 
